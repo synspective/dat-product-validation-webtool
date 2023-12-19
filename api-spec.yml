@@ -1,0 +1,85 @@
+openapi: '3.0.2'
+info:
+  title: Dat Web Validator
+  version: '1.0'
+servers:
+  - url: https://localhost:5000
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+
+# security: 
+#   - 0Auth2:
+#     - write
+#     - read
+
+paths:
+  /api/v1/getDirTree:
+    get:
+      summary:
+        Get directory tree
+      description: |
+        Get directory and file tree from gcs bucket with jon format.   
+        T.B.D.
+        Constaines all files or only geotiff?
+      security:
+        - OAuth2: [read]
+      responses:
+        '200':
+          description: OK
+          content:
+            text/json:
+              schema:
+                type: object
+                example: '{"name": "root", "children": [{"name": "foo", "children": [{"name": "bar", "children": []}]}]}'
+  
+  /api/v1/getFile:
+    get:
+      summary: get Geotiff file
+      parameters:
+        - in: query
+          name: path
+          description: |
+            path to file in gcs bucket.  
+            e.g. foo/bar.tiff
+          required: true
+          schema:
+            type: string
+            example: "foo/bar.tiff"
+        - in: query
+          name: crs
+          description: |
+            Coordinate Reference System.  
+            e.g. EPSG:4326
+          required: false
+          schema:
+            type: string
+            example: "EPSG:4326"
+      description: |
+        Get specific file from gcs bucket. Only geotiff is supported.  
+        Backend process will be like bellow.
+        1. Get file from gcs bucket.
+        2. Convert geotiff to COG(Cloud Optimized Geotiff).
+        3. Return COG to client.
+      security:
+        - OAuth2: [read]
+      responses:
+        '200':
+          description: OK
+          content:
+            # image/tiffでもいいのか？
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  
+ 
