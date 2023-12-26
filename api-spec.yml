@@ -23,7 +23,7 @@ components:
 #     - read
 
 paths:
-  /api/v1/getDirTree:
+  /api/v1/tree:
     get:
       summary:
         Get directory tree
@@ -31,8 +31,8 @@ paths:
         Get directory and file tree from gcs bucket with jon format.   
         T.B.D.
         Constaines all files or only geotiff?
-      security:
-        - OAuth2: [read]
+      # security:
+      #   - OAuth2: [read]
       responses:
         '200':
           description: OK
@@ -40,11 +40,11 @@ paths:
             text/json:
               schema:
                 type: object
-                example: '{"name": "root", "children": [{"name": "foo", "children": [{"name": "bar", "children": []}]}]}'
+                example: '{"name": "root", "path": "/root", "children": [{"name": "foo", "path":"/root/foo", "children": [{"name": "bar", "path":"/root/foo/bar", "children": []}]}]}'
   
-  /api/v1/getFile:
+  /api/v1/cog:
     get:
-      summary: get Geotiff file
+      summary: get cog file
       parameters:
         - in: query
           name: path
