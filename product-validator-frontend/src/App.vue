@@ -25,7 +25,7 @@
             <template v-slot:append>
               <v-btn
                 variant="text"
-                icon="mdi-chevron-left"
+                :icon="railIcon"
                 @click.stop="rail = !rail"
               ></v-btn>
             </template>
@@ -48,12 +48,13 @@ import TreeView from './components/TreeView.vue'
 import TreeViewComponent from './components/TreeViewComponent.vue'
 import Map from 'ol/Map.js'
 import OSM from 'ol/source/OSM.js';
-import TileLayer from 'ol/layer/Tile.js';
+// import TileLayer from 'ol/layer/Tile.js';
 import View from 'ol/View.js';
 import XYZ from 'ol/source/XYZ.js';
 import GeoTIFF from 'ol/source/GeoTIFF.js';
 import {fromEPSGCode, register} from 'ol/proj/proj4.js';
 import proj4 from 'proj4';
+import TileLayer from 'ol/layer/WebGLTile.js';
 
 export default {
   name: 'App',
@@ -65,6 +66,12 @@ export default {
     open: [],
     dirTree: [{"name": "root", "path": "/root", "children": [{"name": "foo", "path":"/root/foo", "children": [{"name": "bar", "path":"/root/foo/bar", "children": []}, {"name": "baz", "path":"/root/foo/baz", "children": []}]}, {"name": "qux", "path":"/root/qux", "children": [{"name": "quux", "path":"/root/qux/quux", "children": []}, {"name": "quuz", "path":"/root/qux/quuz"}]}]}]
   }),
+  computed: {
+    //
+    railIcon: function () {
+      return this.rail ? 'mdi-chevron-left' : 'mdi-chevron-right'
+    }
+  },
   mounted() {
     register(proj4);
 
@@ -77,8 +84,6 @@ export default {
       }]
     });
     const tifLayer = new TileLayer({ source: tif });
-    console.log(tif)
-
     // Create the map
     this.map = new Map({
       target: 'map',
@@ -97,6 +102,7 @@ export default {
       //   center: [0, 0],
       //   zoom: 2,
       // }),
+      // view: tif.getView(),
       view: tif.getView().then((viewConfig) =>
         fromEPSGCode(viewConfig.projection.getCode()).then(() => {
           return {
